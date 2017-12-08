@@ -1,0 +1,6 @@
+<?php
+
+return array(
+	"key" => "EAAJMwXyNdIUBADhhvTDQHVZASYGLkWnBzPa1ZBGlgjccT6pQnwDajf6gC3BXQWaZBWQCmxVU7ZChvsLtXqfkELoCkndOeYdOeTuNeBuN6kyOSYVgeZAY48mrvisJJC57yggq3yGRet60FfVEMRmJLucy7XDZCQ5S9TO1V1gSMVCwZDZD",
+	"page_id" => "1603717796562711", 
+);

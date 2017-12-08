@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Heatmaps</title>
+		<style>
+			#map {
+				height: 100%;
+			}
+			html, body {
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+			#floating-panel {
+				position: absolute;
+				top: 10px;
+				left: 25%;
+				z-index: 5;
+				background-color: #fff;
+				padding: 5px;
+				border: 1px solid #999;
+				text-align: center;
+				font-family: 'Roboto','sans-serif';
+				line-height: 30px;
+				padding-left: 10px;
+			}
+			#floating-panel {
+				background-color: #fff;
+				border: 1px solid #999;
+				left: 25%;
+				padding: 5px;
+				position: absolute;
+				top: 10px;
+				z-index: 5;
+			}
+		</style>
+		<script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.2.0/firebase-database.js"></script>
+	</head>
+
+	<body>
+		<div id="map"></div>
+		<script>
+			function getParameterByName(name, url) {
+				if (!url) url = window.location.href;
+				name = name.replace(/[\[\]]/g, "\\$&");
+				var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+				results = regex.exec(url);
+				if (!results) return null;
+				if (!results[2]) return '';
+				return decodeURIComponent(results[2].replace(/\+/g, " "));
+			}
+
+			var map, heatmap;
+
+			var config = {
+				apiKey: "AIzaSyBOfIeLLT_DcSOR2jeiY9dJKfMMmcjODnY",
+				authDomain: "fir-authe-9535c.firebaseapp.com",
+				databaseURL: "https://fir-authe-9535c.firebaseio.com",
+				projectId: "fir-authe-9535c",
+				storageBucket: "fir-authe-9535c.appspot.com",
+				messagingSenderId: "488387292331"
+			};
+			firebase.initializeApp(config);
+			var database = firebase.database();
+			var starCountRef = database.ref('users');
+
+			function initMap() {
+				map = new google.maps.Map(document.getElementById('map'), {
+					zoom: 16,
+					center: {lat: parseFloat(getParameterByName('lat')), lng: parseFloat(getParameterByName('lng'))},
+				});
+
+				var noPoi = [
+				{
+					featureType: "poi",
+					stylers: [{ visibility: "off" }]
+				},
+				{
+			        "featureType": "transit",
+			        "stylers": [{ "visibility": "off" }]
+			    }
+				];
+
+				map.setOptions({styles: noPoi});
+
+				heatmap = new google.maps.visualization.HeatmapLayer({
+					data: [],
+				});
+				heatmap.set('radius', 30);
+
+				starCountRef.on('value', function(snapshot) {
+					var value = snapshot.val();
+
+					var points = [];
+					Object.keys(value).forEach(function (key) {
+						var user = value[key];
+						if (user.latitude && user.longitude) {
+							points.push(new google.maps.LatLng(user.latitude, user.longitude));
+						}
+					});
+					if (heatmap)
+					{
+						var heatmap2 = new google.maps.visualization.HeatmapLayer({
+							data: points,
+						});
+						heatmap2.setMap(map);
+
+						heatmap.setMap(null);
+						heatmap = heatmap2;
+					}
+				});
+			}
+
+			function changeGradient() {
+				var gradient = [
+					'rgba(0, 255, 255, 0)',
+					'rgba(0, 255, 255, 1)',
+					'rgba(0, 191, 255, 1)',
+					'rgba(0, 127, 255, 1)',
+					'rgba(0, 63, 255, 1)',
+					'rgba(0, 0, 255, 1)',
+					'rgba(0, 0, 223, 1)',
+					'rgba(0, 0, 191, 1)',
+					'rgba(0, 0, 159, 1)',
+					'rgba(0, 0, 127, 1)',
+					'rgba(63, 0, 91, 1)',
+					'rgba(127, 0, 63, 1)',
+					'rgba(191, 0, 31, 1)',
+					'rgba(255, 0, 0, 1)'
+				]
+				heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+			}
+
+			function changeRadius() {
+				heatmap.set('radius', heatmap.get('radius') ? null : 50);
+			}
+
+			function changeOpacity() {
+				heatmap.set('opacity', heatmap.get('opacity') ? null : 0.1);
+			}
+		</script>
+		<script async defer src="https://maps.googleapis.com/maps/api/js?libraries=visualization&callback=initMap"></script>
+	</body>
+</html>

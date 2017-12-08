@@ -1,0 +1,1 @@
+<div class="bootstrap-timepicker">	<div class="form-group">	    {{ Form::label($title, null, ['class' => 'control-label']) }}	    {{ Form::text($name, $value, ['class' => 'form-control timepicker']) }}	</div></div>
